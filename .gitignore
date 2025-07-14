@@ -1,0 +1,89 @@
+# ---------------------
+# Python
+# ---------------------
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.env
+.venv/
+venv/
+env/
+
+# ---------------------
+# Jupyter Notebooks
+# ---------------------
+.ipynb_checkpoints/
+
+# ---------------------
+# VSCode / IDE
+# ---------------------
+.vscode/
+.idea/
+
+# ---------------------
+# Logs and temp
+# ---------------------
+*.log
+*.tmp
+*.bak
+
+# ---------------------
+# MLflow
+# ---------------------
+mlruns/
+mlartifacts/
+mlruns.db
+
+# ---------------------
+# Docker
+# ---------------------
+*.tar
+*.img
+*.container
+**/.dockerignore
+
+# ---------------------
+# AWS
+# ---------------------
+*.pem
+.aws/
+
+# ---------------------
+# OS
+# ---------------------
+.DS_Store
+Thumbs.db
+
+# ---------------------
+# GitHub Actions
+# ---------------------
+.github/
+
+# ---------------------
+# Prefect
+# ---------------------
+.prefect/
+
+# ---------------------
+# Data
+# ---------------------
+data/
+*.csv
+*.xlsx
+*.parquet
+
+# ---------------------
+# Pip freeze output
+# ---------------------
+requirements.txt
+
+# ---------------------
+# Terraform
+# ---------------------
+.terraform/
+*.tfstate
+*.tfstate.backup
