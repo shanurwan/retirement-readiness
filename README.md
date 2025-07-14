@@ -77,7 +77,7 @@ retirement_project/
 ## MLflow Experiment
 
 Tracked:
-- Model: Logistic Regression
+- Model: Random Forest Regressor
 - Parameters: scaling, regularization
 - Metrics: accuracy, recall, F1, custom retirement risk score
 - Artifacts: model.pkl, confusion matrix, metrics.json
