@@ -46,29 +46,32 @@ It helps assess whether a person is “OK” or “Not OK” for retirement at 6
 
 ##  Project Structure
 
+```
 retirement_project/
 ├── pipeline/
-│ ├── init.py
-│ ├── training_pipeline.py # MLflow-tracked training logic
-│ ├── features.py # Feature engineering
-│ ├── model.py # Model training + saving
-│ └── evaluate.py # Metrics
+│   ├── __init__.py                 # Init file for the pipeline module
+│   ├── training_pipeline.py        # Main MLflow-tracked training pipeline
+│   ├── features.py                 # Feature engineering transformations
+│   ├── model.py                    # Model training and persistence logic
+│   └── evaluate.py                 # Evaluation metrics and comparison
 │
 ├── Notebook/
-│ └── eda_notebook.ipynb # EDA + exploration
+│   └── eda_notebook.ipynb          # Exploratory Data Analysis + validation
 │
-├── Dockerfile # Build image for EC2 container
-├── requirements.txt # All Python dependencies
-├── .gitignore
-├── terraform/ # Infrastructure provisioning
-│ ├── main.tf # EC2, IAM, S3 setup
-│ └── variables.tf
+├── Dockerfile                      # Docker image definition for EC2 containerization
+├── requirements.txt                # Python dependencies for training + infra
+├── .gitignore                      # Ignored files and folders (e.g., logs, .env)
+│
+├── terraform/                      # Infrastructure-as-Code (IaC)
+│   ├── main.tf                     # AWS EC2, S3, IAM provisioning
+│   └── variables.tf                # Input variables for Terraform modules
 │
 └── .github/
-└── workflows/
-└── ci.yml # Lint + test pipeline
+    └── workflows/
+        └── ci.yml                  # GitHub Actions workflow for linting and testing
 
 
+```
 ---
 
 ## MLflow Experiment
