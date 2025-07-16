@@ -77,11 +77,6 @@ data/
 *.parquet
 
 # ---------------------
-# Pip freeze output
-# ---------------------
-requirements.txt
-
-# ---------------------
 # Terraform
 # ---------------------
 .terraform/
