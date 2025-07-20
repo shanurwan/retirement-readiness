@@ -5,8 +5,12 @@ import mlflow.sklearn
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
+from sklearn.feature_extraction import DictVectorizer
 import boto3
 import io
+import os
+import pickle
+
 
 @task
 def load_data():
@@ -23,7 +27,7 @@ def load_data():
 
 @task
 def preprocess(df):
-    print("🧹 Preprocessing data...")
+    print(" Preprocessing data...")
     features = [
         'age', 'monthly_income', 'epf_balance', 'debt_amount',
         'household_size', 'medical_expense_monthly', 'mental_stress_level',
@@ -38,32 +42,49 @@ def train_and_log(X_train, X_val, y_train, y_val):
     print("Starting MLflow experiment...")
     mlflow.set_experiment("retirement-prediction")
 
-    with mlflow.start_run() as run:
-        # Train model
-        rf = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=42)
-        rf.fit(X_train, y_train)
+    # Convert to dictionaries
+    train_dicts = X_train.to_dict(orient="records")
+    val_dicts = X_val.to_dict(orient="records")
 
-        # Predictions and metrics
-        preds = rf.predict(X_val)
+    # Vectorize
+    dv = DictVectorizer(sparse=False)
+    X_train_vectorized = dv.fit_transform(train_dicts)
+    X_val_vectorized = dv.transform(val_dicts)
+
+    with mlflow.start_run() as run:
+        rf = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=42)
+        rf.fit(X_train_vectorized, y_train)
+
+        # Save the preprocessor (feature list in this case)
+        dv = X_train.columns.tolist()
+
+        os.makedirs("models", exist_ok=True)
+        with open("models/dv.pkl", "wb") as f_out:
+        pickle.dump(dv, f_out)
+
+
+        preds = rf.predict(X_val_vectorized)
         mae = mean_absolute_error(y_val, preds)
         r2 = r2_score(y_val, preds)
 
-        # Log parameters and metrics
         mlflow.log_param("n_estimators", 100)
         mlflow.log_param("max_depth", 10)
         mlflow.log_metric("mae", mae)
         mlflow.log_metric("r2", r2)
 
-        # Log and register model
         mlflow.sklearn.log_model(
             sk_model=rf,
             artifact_path="model",
             registered_model_name="retirement_rf_model"
         )
 
-        print(f"Model registered to MLflow Registry as 'retirement_rf_model'")
-        print(f"MAE = {mae:.2f}, R2 = {r2:.2f}")
-        print(f" Run ID: {run.info.run_id}")
+        # Save DictVectorizer locally
+        os.makedirs("models", exist_ok=True)
+        with open("models/dv.pkl", "wb") as f_out:
+            pickle.dump(dv, f_out)
+
+        print(f"Model and DictVectorizer saved. Run ID: {run.info.run_id}")
+
 
 @flow
 def retirement_training_pipeline():
