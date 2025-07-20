@@ -7,21 +7,23 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
 import boto3
 import io
-from prefect import task
 
 @task
 def load_data():
+    print(" Loading data from S3...")
     s3 = boto3.client("s3")
     bucket = "retirement-readiness-data"
     key = "data/retirement_dataset.csv"
 
     obj = s3.get_object(Bucket=bucket, Key=key)
     df = pd.read_csv(io.BytesIO(obj["Body"].read()))
-    
+
+    print(f"Loaded {df.shape[0]} rows.")
     return df
 
 @task
 def preprocess(df):
+    print("🧹 Preprocessing data...")
     features = [
         'age', 'monthly_income', 'epf_balance', 'debt_amount',
         'household_size', 'medical_expense_monthly', 'mental_stress_level',
@@ -33,9 +35,10 @@ def preprocess(df):
 
 @task
 def train_and_log(X_train, X_val, y_train, y_val):
-    mlflow.set_experiment("retirement-prediction")
+    print("Starting MLflow experiment...")
 
-    with mlflow.start_run():
+    mlflow.set_experiment("retirement-prediction")
+    with mlflow.start_run() as run:
         rf = RandomForestRegressor(n_estimators=100, max_depth=10, random_state=42)
         rf.fit(X_train, y_train)
 
@@ -48,9 +51,16 @@ def train_and_log(X_train, X_val, y_train, y_val):
         mlflow.log_metric("mae", mae)
         mlflow.log_metric("r2", r2)
 
-        mlflow.sklearn.log_model(rf, "model")
+        print(f" MAE = {mae:.2f}, R2 = {r2:.2f}")
+        
+        mlflow.sklearn.log_model(
+            sk_model=rf,
+            artifact_path="model",
+            registered_model_name="retirement_rf_model"
+        )
 
-        print(f"Logged to MLflow: MAE={mae:.2f}, R2={r2:.2f}")
+        print(f"Model logged and registered to MLflow as 'retirement_rf_model'")
+        print(f" Run ID: {run.info.run_id}")
 
 @flow
 def retirement_training_pipeline():
@@ -58,6 +68,6 @@ def retirement_training_pipeline():
     X_train, X_val, y_train, y_val = preprocess(df)
     train_and_log(X_train, X_val, y_train, y_val)
 
-# To run:
-# retirement_training_pipeline()
-
+if __name__ == "__main__":
+    print("🏁 Running training pipeline...")
+    retirement_training_pipeline()
