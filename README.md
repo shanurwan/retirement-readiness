@@ -62,25 +62,38 @@ retirement_project/
 ├── requirements.txt                # Python dependencies for training + infra
 ├── .gitignore                      # Ignored files and folders (e.g., logs, .env)
 │
-├── terraform/                      # Infrastructure-as-Code (IaC)
-│   ├── main.tf                     # AWS EC2, S3, IAM provisioning
-│   └── variables.tf                # Input variables for Terraform modules
+├── terraform/                      # Infrastructure-as-Code (IaC)                  
+│   └── main.tf                     # AWS EC2, S3, IAM provisioning
 │
 └── .github/
     └── workflows/
         └── ci.yml                  # GitHub Actions workflow for linting and testing
-
+               
 
 ```
 ---
 
 ## MLflow Experiment
 
-Tracked:
 - Model: Random Forest Regressor
-- Parameters: scaling, regularization
-- Metrics: accuracy, recall, F1, custom retirement risk score
-- Artifacts: model.pkl, confusion matrix, metrics.json
+
+- Parameters:
+
+n_estimators = 100
+
+max_depth = 10
+
+- Metrics:
+
+MAE (Mean Absolute Error)
+
+R² (Coefficient of Determination)
+
+- Artifacts:
+
+sklearn-model (logged with mlflow.sklearn.log_model())
+
+Tracked run registered as versioned model under name retirement-readiness-model
 
 Launch with:
 ```bash
@@ -92,23 +105,30 @@ Clone and run locally:
 
 ```
 git clone https://github.com/shanurwan/retirement-project.git
-cd retirement_project
+cd retirement-project
 
-# Set up environment
-python -m venv venv && source venv/bin/activate
+# Set up virtual environment
+python -m venv venv
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+# source venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
 
-# Run pipeline locally
+# Run the training pipeline
 python -m pipeline.training_pipeline
-git clone https://github.com/shanurwan/retirement-project.git
-cd retirement_project
 
 ```
 
 or Run Docker container:
 
 ```
+# Build the Docker image
 docker build -t retirement-pipeline .
+
+# Run the container
 docker run retirement-pipeline
 
 ```
