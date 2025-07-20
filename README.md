@@ -1,4 +1,4 @@
-# Will I Be Okay at 60? (MLOps Zoomcamp Final Project) [In Progress, Target Complete : This week]
+# Will I Be Okay at 60? (MLOps Zoomcamp Final Project)
 
 Retirement Readiness ML Pipeline
 
